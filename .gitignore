@@ -1,1 +1,4 @@
+# build folder
 build/
+# clang
+.clang_complete

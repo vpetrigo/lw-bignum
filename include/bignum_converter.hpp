@@ -4,6 +4,8 @@
 #include <iostream>
 #include <limits>
 #include <algorithm>
+#include <sstream>
+#include <iterator>
 #include <cmath>
 #include <cassert>
 #include <cstddef>
@@ -66,12 +68,39 @@ namespace lw_big {
     }
   }
 
+  class To_dec {
+  public:
+    static constexpr auto HUMAN_DEC_BASE = 10;
+
+    std::string operator()(BigInt&& bint) {
+      using BigIntCont_t = typename BigInt::value_type;
+      std::stringstream ss;
+      std::ostream_iterator<BigIntCont_t> oit{ss};
+
+      naive_base_converter(bint.begin(), bint.end(), oit, BINBASE, HUMAN_DEC_BASE);
+      std::string answer{ss.str()};
+      std::reverse(answer.begin(), answer.end());
+
+      return answer;
+    }
+  };
+
   class Base_Converter {
    public:
     template <typename NumT>
     static BigInt uconvert(NumT num) {
-      return uconvert_impl(std::forward<NumT> (num),
-                    std::is_integral<typename std::decay<NumT>::type> ());
+      return uconvert_impl(num,
+                    std::is_integral<typename std::remove_reference<NumT>::type>());
+    }
+
+    static std::string bconvert(BigInt bint, const base& b) {
+      switch (b) {
+        case base::bin:
+          return {};
+        case base::dec:
+          To_dec converter;
+          return converter(std::move(bint));
+      }
     }
    private:
     // Implementation for string
@@ -124,7 +153,7 @@ namespace lw_big {
 
       for (auto rit = bint.rbegin(); rit != bint.rend(); ++rit) {
         *rit = num & BINMASK;
-        num >>= BINSHIFT;
+        num >>= BINDIGITS;
       }
 
       assert(num == 0);

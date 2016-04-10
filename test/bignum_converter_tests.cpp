@@ -81,7 +81,8 @@ TEST(Unsigned_Big_Integer_Converter, check_converter_from_big_integer) {
 }
 
 TEST(Unsigned_Big_Integer_Converter, check_to_dec_very_big_integer) {
-  const std::string val{"9879879465321321654987987654321321654987987964651321321654987987984654321231654987987654321321654987979879321"};
+  std::string val(10000, '0');
+  val.insert(val.begin(), '1');
   const auto conv_result = lw_big::Base_Converter::uconvert(val);
   const auto back_conv_result = lw_big::Base_Converter::bconvert(conv_result, lw_big::base::dec);
 

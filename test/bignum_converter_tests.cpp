@@ -72,6 +72,22 @@ TEST(Unsigned_Big_Integer_Converter, check_string_and_uint_answer) {
   }
 }
 
+TEST(Unsigned_Big_Integer_Converter, check_converter_from_big_integer) {
+  const std::string val{"9223372036854775807"};
+  const auto conv_result = lw_big::Base_Converter::uconvert(val);
+  const auto back_conv_result = lw_big::Base_Converter::bconvert(conv_result, lw_big::base::dec);
+
+  EXPECT_EQ(val, back_conv_result);
+}
+
+TEST(Unsigned_Big_Integer_Converter, check_to_dec_very_big_integer) {
+  const std::string val{"9879879465321321654987987654321321654987987964651321321654987987984654321231654987987654321321654987979879321"};
+  const auto conv_result = lw_big::Base_Converter::uconvert(val);
+  const auto back_conv_result = lw_big::Base_Converter::bconvert(conv_result, lw_big::base::dec);
+
+  EXPECT_EQ(val, back_conv_result);
+}
+
 /**
  * String to Dec class's tests
  */
@@ -104,7 +120,7 @@ TEST(String_to_Dec_Converter, split_very_big_string) {
     val.append("1234567");
   }
   val.insert(val.begin(), 2, '9');
-  
+
   const auto res = lw_big::String_to_Dec::split_string_for_num(val);
   lw_big::String_to_Dec::value_type ans(80, 1234567);
   ans.insert(ans.begin(),99);

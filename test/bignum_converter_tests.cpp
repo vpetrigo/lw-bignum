@@ -1,5 +1,5 @@
-#include <gtest/gtest.h>
 #include "bignum_converter.hpp"
+#include <gtest/gtest.h>
 
 /**
  * Base Converter class's tests
@@ -75,7 +75,8 @@ TEST(Unsigned_Big_Integer_Converter, check_string_and_uint_answer) {
 TEST(Unsigned_Big_Integer_Converter, check_converter_from_big_integer) {
   const std::string val{"9223372036854775807"};
   const auto conv_result = lw_big::Base_Converter::uconvert(val);
-  const auto back_conv_result = lw_big::Base_Converter::bconvert(conv_result, lw_big::base::dec);
+  const auto back_conv_result =
+      lw_big::Base_Converter::bconvert(conv_result, lw_big::base::dec);
 
   EXPECT_EQ(val, back_conv_result);
 }
@@ -84,9 +85,34 @@ TEST(Unsigned_Big_Integer_Converter, check_to_dec_very_big_integer) {
   std::string val(10000, '0');
   val.insert(val.begin(), '1');
   const auto conv_result = lw_big::Base_Converter::uconvert(val);
-  const auto back_conv_result = lw_big::Base_Converter::bconvert(conv_result, lw_big::base::dec);
+  const auto back_conv_result =
+      lw_big::Base_Converter::bconvert(conv_result, lw_big::base::dec);
 
   EXPECT_EQ(val, back_conv_result);
+}
+
+TEST(Unsigned_Big_Integer_Converter, check_to_bin_converter_unsigned_int) {
+  constexpr unsigned int val = 255;
+  const auto conv_result = lw_big::Base_Converter::uconvert(val);
+  const auto back_conv_result =
+      lw_big::Base_Converter::bconvert(conv_result, lw_big::base::bin);
+  const std::string ans{"11111111"};
+
+  EXPECT_EQ(ans, back_conv_result);
+}
+
+TEST(Unsigned_Big_Integer_Converter, check_to_bin_unsigned_long_long) {
+  const std::string val{"6546549879876954651"};
+  const std::string ans{
+      "101101011011010000001000110111000111110011100010010101000011011"};
+  const auto conv_result = lw_big::Base_Converter::uconvert(val);
+  const auto back_conv_result =
+      lw_big::Base_Converter::bconvert(conv_result, lw_big::base::bin);
+
+  EXPECT_EQ(ans.size(), back_conv_result.size());
+  for (std::size_t i = 0; i < ans.size(); ++i) {
+    ASSERT_EQ(ans[i], back_conv_result[i]);
+  }
 }
 
 /**
@@ -124,7 +150,7 @@ TEST(String_to_Dec_Converter, split_very_big_string) {
 
   const auto res = lw_big::String_to_Dec::split_string_for_num(val);
   lw_big::String_to_Dec::value_type ans(80, 1234567);
-  ans.insert(ans.begin(),99);
+  ans.insert(ans.begin(), 99);
 
   EXPECT_EQ(res.size(), ans.size());
   for (auto i = 0; i < ans.size(); ++i) {

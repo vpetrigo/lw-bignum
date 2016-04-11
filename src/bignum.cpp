@@ -28,6 +28,12 @@ const UBignum UBignum::operator+(const UBignum& rhs) const {
   return UBignum(*this) += rhs;
 }
 
+UBignum& operator-=(const UBignum& rhs) {
+  this->substr(rhs.storage);
+  
+  return *this;
+}
+
 void UBignum::add(const BigInt& b) noexcept {
   // determine size needed for storing the result
   auto diff = 0;
@@ -57,6 +63,10 @@ void UBignum::add(const BigInt& b) noexcept {
   else {
     storage.erase(storage.begin());
   }
+}
+
+void UBignum::substr(const BigInt& b) {
+  // if (storage.size() < b.size() ||
 }
 
 }  // namespace lw_big

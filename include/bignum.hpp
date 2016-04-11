@@ -42,6 +42,7 @@ class UBignum : public Bignum {
   
   private:
     void add(const BigInt& b);
+    void substr(const BigInt& b);
 };
 
 }  // namespace lw_big

@@ -9,7 +9,6 @@
 #include <iterator>
 #include <limits>
 #include <sstream>
-#include "bignum.hpp"
 #include "bignum_defs.hpp"
 
 namespace lw_big {

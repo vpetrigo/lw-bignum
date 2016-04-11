@@ -15,3 +15,4 @@ include_directories(
     ${GTEST_INCLUDE_DIRS})
     
 add_lw_big_test(bignum_converter)
+add_lw_big_test(bignum)

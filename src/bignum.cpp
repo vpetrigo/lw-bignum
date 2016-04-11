@@ -19,9 +19,7 @@ std::string UBignum::repr(const base& b) const {
 }
 
 UBignum& UBignum::operator+=(const UBignum& rhs) {
-  if (this != &rhs) {
-    this->add(rhs.storage);
-  }
+  this->add(rhs.storage);
   
   return *this;
 }

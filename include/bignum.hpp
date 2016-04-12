@@ -10,7 +10,7 @@ namespace lw_big {
 class Bignum {
  public:
   Bignum() = delete;
-  
+
   virtual std::string repr(const base& b) const = 0;
   virtual ~Bignum();
 
@@ -28,7 +28,7 @@ class UBignum : public Bignum {
   explicit UBignum(const std::string& num);
   // initialize big number with a unsigned integer
   explicit UBignum(const unsigned long long num);
-  
+
   UBignum& operator+=(const UBignum& rhs);
   const UBignum operator+(const UBignum& rhs) const;
   UBignum& operator-=(const UBignum& rhs);
@@ -39,9 +39,17 @@ class UBignum : public Bignum {
   const UBignum operator/(const UBignum& rhs) const;
 
   std::string repr(const base& b) const;
-  
+
   private:
-    void add(const BigInt& b);
+    // enumeration for determing whether it is necessary to deal with carry
+    // in the add(...) function or not
+    enum class add_carry {
+      no,
+      yes
+    };
+
+    void add(const BigInt& b, const add_carry& ac) noexcept;
+    void substr(const BigInt& b) noexcept;
 };
 
 }  // namespace lw_big

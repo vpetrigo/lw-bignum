@@ -49,7 +49,13 @@ template <typename FromNumContIt, typename ToNumIt>
 void naive_base_converter(FromNumContIt begin, FromNumContIt end,
                           ToNumIt to_back, const int from_base,
                           const int to_base) {
+  // in case one digit number passed and 0 is in that digit
+  if (std::distance(begin, end) == 1 && *begin == 0) {
+    *to_back++ = 0;
+  }
+
   while (begin != end) {
+    // if there is a zero at the beginning just skip that digit
     if (*begin == 0) {
       ++begin;
     }
@@ -83,6 +89,11 @@ class To_dec {
                          HUMAN_DEC_BASE);
     std::string answer{ss.str()};
     std::reverse(answer.begin(), answer.end());
+    answer.erase(answer.begin(),
+                 std::find_if_not(answer.begin(), answer.end() - 1,
+                                  [](const std::string::value_type& e) {
+                                    return e == '0';
+                                  }));
 
     return answer;
   }
@@ -101,8 +112,14 @@ class To_bin {
 
     naive_base_converter(bint.begin(), bint.end(), oit, BINBASE,
                          HUMAN_BIN_BASE);
+
     std::string answer{ss.str()};
     std::reverse(answer.begin(), answer.end());
+    answer.erase(answer.begin(),
+                 std::find_if_not(answer.begin(), answer.end() - 1,
+                                  [](const std::string::value_type& e) {
+                                    return e == '0';
+                                  }));
 
     return answer;
   }

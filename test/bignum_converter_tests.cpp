@@ -72,6 +72,26 @@ TEST(Unsigned_Big_Integer_Converter, check_string_and_uint_answer) {
   }
 }
 
+TEST(Unsigned_Big_Integer_Converter, check_converter_from_zero) {
+  const std::string val{"0"};
+  const auto conv_result = lw_big::Base_Converter::uconvert(val);
+  const std::string ans{"0"};
+  const auto result = lw_big::Base_Converter::bconvert(conv_result, lw_big::base::dec);
+
+  EXPECT_EQ(result.size(), ans.size());
+  EXPECT_EQ(result, ans);
+}
+
+TEST(Unsigned_Big_Integer_Converter, check_converter_from_small_int) {
+  const std::string val{"10"};
+  const auto conv_result = lw_big::Base_Converter::uconvert(val);
+  const std::string ans{"10"};
+  const auto result = lw_big::Base_Converter::bconvert(conv_result, lw_big::base::dec);
+
+  EXPECT_EQ(result.size(), ans.size());
+  EXPECT_EQ(result, ans);
+}
+
 TEST(Unsigned_Big_Integer_Converter, check_converter_from_big_integer) {
   const std::string val{"9223372036854775807"};
   const auto conv_result = lw_big::Base_Converter::uconvert(val);
@@ -89,6 +109,16 @@ TEST(Unsigned_Big_Integer_Converter, check_to_dec_very_big_integer) {
       lw_big::Base_Converter::bconvert(conv_result, lw_big::base::dec);
 
   EXPECT_EQ(val, back_conv_result);
+}
+
+TEST(Unsigned_Big_Integer_Converter, check_to_bin_zero) {
+  constexpr unsigned int val = 0;
+  const auto conv_result = lw_big::Base_Converter::uconvert(val);
+  const auto back_conv_result =
+      lw_big::Base_Converter::bconvert(conv_result, lw_big::base::bin);
+  const std::string ans{"0"};
+
+  EXPECT_EQ(ans, back_conv_result);
 }
 
 TEST(Unsigned_Big_Integer_Converter, check_to_bin_converter_unsigned_int) {
@@ -118,6 +148,28 @@ TEST(Unsigned_Big_Integer_Converter, check_to_bin_unsigned_long_long) {
 /**
  * String to Dec class's tests
  */
+TEST(String_to_Dec_Converter, split_small_string_with_zero) {
+  const std::string val{"0"};
+  const auto res = lw_big::String_to_Dec::split_string_for_num(val);
+  const lw_big::String_to_Dec::value_type ans{0};
+
+  EXPECT_EQ(res.size(), ans.size());
+  for (auto i = 0; i < ans.size(); ++i) {
+    EXPECT_EQ(res[i], ans[i]);
+  }
+}
+
+TEST(String_to_Dec_Converter, split_small_string_with_zeros) {
+  const std::string val{"0000000"};
+  const auto res = lw_big::String_to_Dec::split_string_for_num(val);
+  const lw_big::String_to_Dec::value_type ans{0};
+
+  EXPECT_EQ(res.size(), ans.size());
+  for (auto i = 0; i < ans.size(); ++i) {
+    EXPECT_EQ(res[i], ans[i]);
+  }
+}
+
 TEST(String_to_Dec_Converter, split_small_string) {
   const std::string val{"10"};
   const auto res = lw_big::String_to_Dec::split_string_for_num(val);

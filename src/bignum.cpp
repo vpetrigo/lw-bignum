@@ -1,7 +1,7 @@
+#include "bignum.hpp"
 #include <algorithm>
 #include <cstddef>
 #include <iostream>
-#include "bignum.hpp"
 #include "bignum_defs.hpp"
 
 namespace lw_big {
@@ -40,15 +40,13 @@ const UBignum UBignum::operator-(const UBignum& rhs) const {
 }
 
 void UBignum::add(const BigInt& b, const add_carry& ac) noexcept {
-  if (ac == add_carry::yes) {
-    // determine size needed for storing the result
-    auto diff = 0;
-    if (b.size() > storage.size()) {
-      diff = b.size() - storage.size();
-    }
-    BigInt lead_zeros(diff + 1, 0);
-    storage.insert(storage.begin(), lead_zeros.begin(), lead_zeros.end());
+  // determine size needed for storing the result
+  auto diff = 0;
+  if (b.size() > storage.size()) {
+    diff = b.size() - storage.size();
   }
+  BigInt lead_zeros(diff + 1, 0);
+  storage.insert(storage.begin(), lead_zeros.begin(), lead_zeros.end());
 
   unsigned short rem = 0;
   auto a_rev_it = storage.rbegin();
@@ -64,26 +62,32 @@ void UBignum::add(const BigInt& b, const add_carry& ac) noexcept {
     ++b_rev_it;
   }
 
+  // if we still have remainder just pass through all digits and try to add
+  // remainder
+  // in case of overflow of current BINBASE in a digit, set it to zero and go
+  // further
   if (rem) {
-    *a_rev_it = rem;
+    while ((*a_rev_it + rem) % BINBASE == 0) {
+      *a_rev_it++ = 0;
+    }
+    *a_rev_it += rem;
   }
 
-  if (!storage.front()) {
+  if (!storage.front() || ac == add_carry::no) {
     storage.erase(storage.begin());
   }
 }
 
 void UBignum::substr(const BigInt& b) noexcept {
+  // a - b = a + (-b + 1)
   auto max_size = std::max(storage.size(), b.size());
-  // extend number if necessary
-  if (storage.size() < max_size) {
-    storage.insert(storage.begin(), max_size - storage.size(), 0);
-  }
-  
+  // for storing '-b'
   BigInt neg_b(max_size);
+  // + 1
   BigInt one{1};
 
   std::copy(b.crbegin(), b.crend(), neg_b.rbegin());
+  // do b = -b
   std::transform(neg_b.begin(), neg_b.end(), neg_b.begin(),
                  [](const BigInt::value_type& e) { return ~e % BINBASE; });
   add(neg_b, add_carry::no);

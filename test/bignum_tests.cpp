@@ -77,19 +77,25 @@ TEST(Unsigned_Big_Numbers, addition_operator_num_plus_zero) {
   }
 }
 
+TEST(Unsigned_Big_Numbers, addition_operator_num_plus_num) {
+  for (size_t i = 0; i < std::numeric_limits<unsigned short>::max(); ++i) {
+    ASSERT_EQ(std::to_string(i + i), (lw_big::UBignum (i) + lw_big::UBignum (i)).repr(lw_big::base::dec));
+  }
+}
+
 TEST(Unsigned_Big_Numbers, assignment_with_substraction_test) {
-  lw_big::UBignum a{999};
+  lw_big::UBignum a{256};
   const lw_big::UBignum b{1};
-  const std::string ans{"998"};
+  const std::string ans{"255"};
 
   a -= b;
   EXPECT_EQ(ans, a.repr(lw_big::base::dec));
 }
 
 TEST(Unsigned_Big_Numbers, assignment_with_substraction_test2) {
-  lw_big::UBignum a{"1000000000001"};
+  lw_big::UBignum a{"1"};
   const lw_big::UBignum b{1};
-  const std::string ans{"1000000000000"};
+  const std::string ans{"0"};
 
   a -= b;
   EXPECT_EQ(ans, a.repr(lw_big::base::dec));
@@ -105,15 +111,24 @@ TEST(Unsigned_Big_Numbers, assignment_with_substraction_test3_zero_plus_zero) {
 }
 
 TEST(Unsigned_Big_Numbers, assignment_with_substraction_test4_num_plus_zero) {
-  lw_big::UBignum a{"10000000"};
+  lw_big::UBignum a{"255"};
   const lw_big::UBignum b{"0"};
-  const std::string ans{"10000000"};
+  const std::string ans{"255"};
 
   a -= b;
   EXPECT_EQ(ans, a.repr(lw_big::base::dec));
 }
 
-TEST(Unsigned_Big_Numbers, assignment_with_substraction_test5_small_minus_big) {
+TEST(Unsigned_Big_Numbers, assignment_with_substraction_test5_num_plus_zero) {
+  lw_big::UBignum a{"256"};
+  const lw_big::UBignum b{"0"};
+  const std::string ans{"256"};
+
+  a -= b;
+  EXPECT_EQ(ans, a.repr(lw_big::base::dec));
+}
+
+TEST(Unsigned_Big_Numbers, assignment_with_substraction_test6_small_minus_big) {
   lw_big::UBignum a{"1"};
   const lw_big::UBignum b{"100000"};
   const std::string ans{"16677217"};
@@ -136,5 +151,26 @@ TEST(Unsigned_Big_Numbers, addition_operator_num_minus_num) {
   
   for (size_t i = 0; i < std::numeric_limits<unsigned short>::max(); ++i) {
     ASSERT_EQ(ans, (lw_big::UBignum (i) - lw_big::UBignum (i)).repr(lw_big::base::dec));
+  }
+}
+
+TEST(Unsigned_Big_Numbers, addition_and_substraction_test1) {
+  const lw_big::UBignum a{255};
+  const lw_big::UBignum b{256};
+  const lw_big::UBignum c{1};
+  const auto res = a - b + c;
+  const std::string ans{"65536"};
+  EXPECT_EQ(ans, res.repr(lw_big::base::dec));
+}
+
+TEST(Unsigned_Big_Numbers, addition_and_substraction_test2_long) {
+  for (size_t i = 0; i < std::numeric_limits<unsigned short>::max(); ++i) {
+    const lw_big::UBignum a{i + 3};
+    const lw_big::UBignum b{i + 2};
+    const lw_big::UBignum c{i + 1};
+    const lw_big::UBignum res = a + c - b;
+    std::string ans{std::to_string(i + 2)};
+    
+    ASSERT_EQ(ans, res.repr(lw_big::base::dec));
   }
 }

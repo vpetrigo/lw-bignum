@@ -68,6 +68,15 @@ TEST(Unsigned_Big_Numbers, addition_operator_test) {
   EXPECT_EQ(ans, c.repr(lw_big::base::dec));
 }
 
+TEST(Unsigned_Big_Numbers, addition_operator_num_plus_zero) {
+  constexpr auto z = 0UL;
+  const lw_big::UBignum zero{z};
+  
+  for (size_t i = 0; i < std::numeric_limits<unsigned short>::max(); ++i) {
+    ASSERT_EQ(std::to_string(z + i), (lw_big::UBignum (i) + zero).repr(lw_big::base::dec));
+  }
+}
+
 TEST(Unsigned_Big_Numbers, assignment_with_substraction_test) {
   lw_big::UBignum a{999};
   const lw_big::UBignum b{1};
@@ -111,4 +120,21 @@ TEST(Unsigned_Big_Numbers, assignment_with_substraction_test5_small_minus_big) {
 
   a -= b;
   EXPECT_EQ(ans, a.repr(lw_big::base::dec));
+}
+
+TEST(Unsigned_Big_Numbers, substraction_operator_num_minus_zero) {
+  constexpr auto z = 0UL;
+  const lw_big::UBignum zero{z};
+  
+  for (size_t i = 0; i < std::numeric_limits<unsigned short>::max(); ++i) {
+    ASSERT_EQ(std::to_string(z + i), (lw_big::UBignum (i) - zero).repr(lw_big::base::dec));
+  }
+}
+
+TEST(Unsigned_Big_Numbers, addition_operator_num_minus_num) {
+  const std::string ans{"0"};
+  
+  for (size_t i = 0; i < std::numeric_limits<unsigned short>::max(); ++i) {
+    ASSERT_EQ(ans, (lw_big::UBignum (i) - lw_big::UBignum (i)).repr(lw_big::base::dec));
+  }
 }

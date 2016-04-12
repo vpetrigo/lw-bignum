@@ -1,5 +1,6 @@
-#include <cstddef>
 #include <algorithm>
+#include <cstddef>
+#include <iostream>
 #include "bignum.hpp"
 #include "bignum_defs.hpp"
 
@@ -19,8 +20,8 @@ std::string UBignum::repr(const base& b) const {
 }
 
 UBignum& UBignum::operator+=(const UBignum& rhs) {
-  this->add(rhs.storage);
-  
+  this->add(rhs.storage, add_carry::yes);
+
   return *this;
 }
 
@@ -28,45 +29,65 @@ const UBignum UBignum::operator+(const UBignum& rhs) const {
   return UBignum(*this) += rhs;
 }
 
-UBignum& operator-=(const UBignum& rhs) {
+UBignum& UBignum::operator-=(const UBignum& rhs) {
   this->substr(rhs.storage);
-  
+
   return *this;
 }
 
-void UBignum::add(const BigInt& b) noexcept {
-  // determine size needed for storing the result
-  auto diff = 0;
-  if (b.size() > storage.size()) {
-    diff = b.size() - storage.size();
-  }
-  BigInt lead_zeros(diff + 1, 0);
-  storage.insert(storage.begin(), lead_zeros.begin(), lead_zeros.end());
+const UBignum UBignum::operator-(const UBignum& rhs) const {
+  return UBignum(*this) -= rhs;
+}
 
-  unsigned short remainder = 0;
+void UBignum::add(const BigInt& b, const add_carry& ac) noexcept {
+  if (ac == add_carry::yes) {
+    // determine size needed for storing the result
+    auto diff = 0;
+    if (b.size() > storage.size()) {
+      diff = b.size() - storage.size();
+    }
+    BigInt lead_zeros(diff + 1, 0);
+    storage.insert(storage.begin(), lead_zeros.begin(), lead_zeros.end());
+  }
+
+  unsigned short rem = 0;
   auto a_rev_it = storage.rbegin();
   auto b_rev_it = b.crbegin();
   auto b_rev_end = b.crend();
-  
+
   while (b_rev_it != b_rev_end) {
-    auto result = *b_rev_it + *a_rev_it + remainder;
-    
+    auto result = *b_rev_it + *a_rev_it + rem;
+
     *a_rev_it = result % BINBASE;
-    remainder = result / BINBASE;
+    rem = result / BINBASE;
     ++a_rev_it;
     ++b_rev_it;
   }
-  
-  if (remainder) {
-    *a_rev_it = remainder;
+
+  if (rem) {
+    *a_rev_it = rem;
   }
-  else {
+
+  if (!storage.front()) {
     storage.erase(storage.begin());
   }
 }
 
-void UBignum::substr(const BigInt& b) {
-  // if (storage.size() < b.size() ||
+void UBignum::substr(const BigInt& b) noexcept {
+  auto max_size = std::max(storage.size(), b.size());
+  // extend number if necessary
+  if (storage.size() < max_size) {
+    storage.insert(storage.begin(), max_size - storage.size(), 0);
+  }
+  
+  BigInt neg_b(max_size);
+  BigInt one{1};
+
+  std::copy(b.crbegin(), b.crend(), neg_b.rbegin());
+  std::transform(neg_b.begin(), neg_b.end(), neg_b.begin(),
+                 [](const BigInt::value_type& e) { return ~e % BINBASE; });
+  add(neg_b, add_carry::no);
+  add(one, add_carry::no);
 }
 
 }  // namespace lw_big
